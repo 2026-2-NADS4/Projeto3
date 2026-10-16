@@ -22,12 +22,24 @@ name: ShielDepy chaos
 on:
   pull_request:
     paths:
-      - 'shieldepy_p1/**'
+      - 'apps/**'
+      - 'packages/**'
+      - 'examples/**'
+      - 'fixtures/**'
+      - 'scripts/**'
+      - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/shieldepy-chaos.yml'
   push:
     branches: [main]
     paths:
-      - 'shieldepy_p1/**'
+      - 'apps/**'
+      - 'packages/**'
+      - 'examples/**'
+      - 'fixtures/**'
+      - 'scripts/**'
+      - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/shieldepy-chaos.yml'
   workflow_dispatch:
 
@@ -42,7 +54,6 @@ concurrency:
 defaults:
   run:
     shell: bash
-    working-directory: shieldepy_p1
 
 jobs:
   chaos:
@@ -76,8 +87,8 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: |
-            shieldepy_p1/package-lock.json
-            shieldepy_p1/examples/*/package-lock.json
+            package-lock.json
+            examples/*/package-lock.json
 
       - name: Instalar o ShielDepy
         run: npm ci
@@ -167,8 +178,8 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: |
-            shieldepy_p1/package-lock.json
-            shieldepy_p1/examples/*/package-lock.json
+            package-lock.json
+            examples/*/package-lock.json
       - run: npm ci
       - name: Instalar os exemplos executáveis
         run: |

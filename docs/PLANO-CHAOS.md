@@ -38,7 +38,7 @@ Princípio mantido do projeto: *o motor prova, a IA propõe*. Toda saída da IA 
 - **Nada de regex para ler código** (só Tree-sitter ou analisador léxico). Regex em texto da IA ou em caminho de arquivo pode.
 - O princípio do projeto: **o motor prova, a IA propõe**. Toda saída da IA é validada, existe caminho offline, e um teste só conta como falha se o controle passou.
 
-**Como rodar (de `shieldepy_p1/`):**
+**Como rodar (da raiz do repositório):**
 - `npm run check`: typecheck + testes unitários (**325** no fim da etapa R, nenhum pulado quando os exemplos têm `npm install`).
 - `npm run build:vscode`: dois arquivos. `dist/extension.js` tem ~640 KB; se crescer muito, algo puxou o LangGraph para dentro dele. O `dist/chaos.js` (~1,9 MB) é o pipeline de caos, carregado só pelo "Testar Caos".
 - `npm run test:e2e -w shieldepy`: E2E num VS Code real (**33/33**, leva alguns minutos). O cenário do caos de verdade só roda com `npm install` em `examples/checkout-express`.
@@ -135,7 +135,7 @@ Este arquivo é atualizado a cada tarefa concluída, no mesmo commit da mudança
   - Exemplo `examples/checkout-express`: Express com DI, barrel, tsconfig `paths`, interface `PaymentGateway`, race condition proposital no checkout e Stripe sem timeout. **Mapa 100% provado.** A cadeia `POST /checkout` → `CheckoutController.create` → `CheckoutService.checkout` → `StockRepository`/`OrderRepository` → `pg` e → `StripeGateway.charge` (via interface) está coberta por teste.
   - Bug corrigido: a ligação por interface dependia da ordem de indexação. Agora quem usa uma interface é religado quando uma classe passa a implementá-la, ou deixa de implementar.
   - `references` só aponta para função ou método do projeto. Valores passados como argumento (`req.body`) não viram aresta.
-  - README do `shieldepy_p1` atualizado (como uma chamada vira aresta, mapa do código, limites).
+  - README atualizado (como uma chamada vira aresta, mapa do código, limites).
   - Suíte: 199 testes.
   - **Medição atual:** `packages/` 99,5%, `apps/` 99,0%, `checkout-express` 100%, sempre com 0 chamadas sem alvo e 0 imports quebrados.
 - 2026-10-07: **1d, parte 1: extratores de regras sem regex.**
@@ -238,7 +238,7 @@ Este arquivo é atualizado a cada tarefa concluída, no mesmo commit da mudança
   - **Extensão:** comando **"ShielDepy: Exportar Topologia (rotas e I/O)"**. Usa o grafo e as regras que já estão em memória (sem reindexar), grava `.shieldepy/topology-graph.json` na raiz e avisa quantas rotas, rotas sensíveis e operações saíram, com atalhos "Abrir arquivo" e "Ver rotas no mapa". O aviso diz quando o mapa tem chamadas não provadas.
   - O painel **"Ver Mapa do Sistema"** passa a receber a topologia: rotas e operações viram nós também no editor, e o "Abrir código" de uma rota leva ao registro dela.
   - **E2E: 24/24 num VS Code 1.141 real.** O cenário novo exporta a topologia do workspace e confere `POST /checkout` com `db_read stock → api_call api.stripe.com → db_write stock → db_write orders`, as tags, a confiança `proven`, o arquivo igual ao que está em memória e o painel do mapa com a mesma topologia.
-  - README do `shieldepy_p1`: seção "Topologia: rotas e operações de I/O", comando na lista da CLI, arquivos no mapa do código e limites conhecidos.
+  - README: seção "Topologia: rotas e operações de I/O", comando na lista da CLI, arquivos no mapa do código e limites conhecidos.
   - Escrita a seção **"E3 — contexto sobre o que a E2 entregou"**: o que a E3 reaproveita, o catálogo × tags, as pendências achadas no código (o exemplo não executa, falta a variante corrigida, o provider não devolve tokens, os modelos padrão, a tabela de custo) e as tarefas 3a–3f com a aceitação.
   - **Estado final da E2:** 233 testes unitários, E2E 24/24, typecheck limpo, extensão compila, e o mapa do `checkout-express` continua com o mesmo hash da E1 (`6801cb46…`). Pronta para o usuário subir a branch `feat/topologia` e fazer o merge.
 - 2026-10-08: **E2 mergeada** (PR #3). Branch `feat/chaos-agentes` criada a partir da `main` (`b4eeb7b`). **E3 iniciada.**
@@ -374,7 +374,7 @@ Este arquivo é atualizado a cada tarefa concluída, no mesmo commit da mudança
   - Conferido no `checkout-express` de verdade (exit 1, 4 achados, 2 hipóteses `partial_failure` sem teste). As operações saem como lista (`- `); sem isso, o GitHub juntava as linhas num parágrafo só.
   - Suíte: **288 testes**.
 - 2026-10-08: **4d concluído (GitHub Actions + template).**
-  - **`.github/workflows/shieldepy-chaos.yml`** (raiz do repositório). Roda em PR e push na `main` que toquem `shieldepy_p1/**`, e à mão. Usa Node 22, cache do npm e `npm ci` no ShielDepy e no alvo.
+  - **`.github/workflows/shieldepy-chaos.yml`** (raiz do repositório). Roda em PR e push na `main` que toquem `apps/**`, `packages/**`, `examples/**` e afins, e à mão. Usa Node 22, cache do npm e `npm ci` no ShielDepy e no alvo.
   - **Decisão, por causa do exemplo vulnerável:** o `checkout-express` quebra de propósito, então usá-lo como portão deixaria todo PR vermelho. Por isso há uma matriz com dois papéis:
     - **`chaos-gate`:** roda no `checkout-express-fixed` com `--fail-on Alto`, publica o relatório no `$GITHUB_STEP_SUMMARY` e comenta no PR (`gh pr comment --edit-last || gh pr comment`, com `continue-on-error`, porque PR de fork não tem permissão de escrita). **É o portão:** um PR que reintroduza a corrida ou tire o timeout do Stripe no corrigido fica vermelho. É assim que se faz o "PR de teste com check vermelho" da 4e;
     - **`self-test`:** o vulnerável **tem** que sair com 1, e o relatório tem que trazer a corrida em `stock` e o timeout do Stripe. Se o detector ficar cego, o CI fica vermelho.
@@ -382,13 +382,13 @@ Este arquivo é atualizado a cada tarefa concluída, no mesmo commit da mudança
   - **IA:** com o secret `ANTHROPIC_API_KEY`, usa a IA; sem ele, `--offline`. **Não configurei secret nenhum**: ligar a IA paga no CI é decisão do usuário.
   - O código de saída do `shieldepy` é capturado (`node apps/cli/bin/shieldepy.js`, sem `npm run`, que pode trocar o código). O relatório é publicado antes, e só no fim o passo "Portão" sai com esse código, com `::error::` dizendo se foi achado (1) ou ambiente (2).
   - **Simulado localmente** com o mesmo bash dos passos: no `chaos-gate`, o corrigido sai 0; no `self-test`, o vulnerável sai 1, com a corrida e o timeout encontrados no relatório. O YAML foi validado com `js-yaml`, e os lockfiles têm os binários de Linux (rollup/esbuild). **Não rodou no GitHub:** isso depende do push.
-  - **Template para repositórios-alvo:** `shieldepy_p1/docs/shieldepy-chaos.template.yml`, com o guia `docs/chaos-ci.md` (contrato, dependências, `env` do topo, códigos de saída, severidade, IA e custo, limites). Como o ShielDepy não está no npm, o template faz o checkout dele e o **move para `$RUNNER_TEMP`**: com `APP_DIR: .`, ele ficaria dentro do app e entraria no mapa.
+  - **Template para repositórios-alvo:** `docs/shieldepy-chaos.template.yml`, com o guia `docs/chaos-ci.md` (contrato, dependências, `env` do topo, códigos de saída, severidade, IA e custo, limites). Como o ShielDepy não está no npm, o template faz o checkout dele e o **move para `$RUNNER_TEMP`**: com `APP_DIR: .`, ele ficaria dentro do app e entraria no mapa.
   - README: execução, portão, `--report`, o workflow e os arquivos novos no mapa do código.
 - 2026-10-08: **4e concluído (aceitação), e com ele a E4.**
   - **`shieldepy chaos examples/checkout-express --offline` → exit 1**, com 4 achados: `race_condition stock` (Crítico, `stateCheck: stockNeverNegative`), `timeout api.stripe.com` (Alto, 6 s sem resposta), e `http_5xx` e `malformed_response` (Alto, a rota fica pendurada). O relatório aponta a corrida e o timeout com as operações e o `arquivo:linha`.
   - **O mesmo no `checkout-express-fixed` → exit 0**, com 3 testes aguentando. Os dois casos estão fixados na suíte (Vitest de verdade, pulados sem `npm install` nos exemplos) e no job `self-test` do CI.
   - **PR de teste, simulado localmente:** tirar o `signal: AbortSignal.timeout(...)` do `StripeGateway` do `-fixed` faz o motor ver `no-timeout` e gerar a hipótese de timeout. O teste quebra (`respondsWithin`, 6 s), e `--fail-on Alto` sai com **exit 1** e o relatório "Bloqueado: 1 achado". O arquivo foi restaurado.
-  - **Roteiro do PR de teste no GitHub (falta fazer, depende do push):** depois do merge da E4, criar uma branch a partir da `main` que só remova a linha `signal: AbortSignal.timeout(STRIPE_TIMEOUT_MS),` de `shieldepy_p1/examples/checkout-express-fixed/src/gateways/StripeGateway.ts` e abrir o PR. Esperado: o job `chaos-gate` vermelho ("o código quebra sob falha injetada"), o `self-test` e o `check` verdes, e um comentário no PR com o relatório (tabela com `🟠 Alto` · `timeout` · `api.stripe.com`). Depois, fechar o PR sem merge.
+  - **Roteiro do PR de teste no GitHub (falta fazer, depende do push):** depois do merge da E4, criar uma branch a partir da `main` que só remova a linha `signal: AbortSignal.timeout(STRIPE_TIMEOUT_MS),` de `examples/checkout-express-fixed/src/gateways/StripeGateway.ts` e abrir o PR. Esperado: o job `chaos-gate` vermelho ("o código quebra sob falha injetada"), o `self-test` e o `check` verdes, e um comentário no PR com o relatório (tabela com `🟠 Alto` · `timeout` · `api.stripe.com`). Depois, fechar o PR sem merge.
   - **Mensagem do portão:** sem `--fail-on`, diz só "N achado(s) de caos", em vez de "severidade Baixo ou pior". O relatório faz igual.
   - **Conferido no fim:** typecheck limpo, **288 testes**, **E2E 24/24** num VS Code real (o core mudou na 4b: varredura e religação), extensão com **612 KB** (o caos continua fora do bundle).
   - **Estado final da E4:** pronta para o usuário subir a branch `feat/chaos-gate` e fazer o merge.
@@ -659,7 +659,7 @@ Este arquivo é atualizado a cada tarefa concluída, no mesmo commit da mudança
     - E2E **33/33** (+1: sem portal, a conta some e as colisões ficam).
   - **Para publicar o release (o usuário decide e faz):**
     1. `npm run package:vscode`;
-    2. `gh release create v0.1.0 shieldepy_p1/apps/vscode/shieldepy-0.1.0.vsix --title "ShielDepy 0.1.0" --notes-file shieldepy_p1/apps/vscode/CHANGELOG.md`.
+    2. `gh release create v0.1.0 apps/vscode/shieldepy-0.1.0.vsix --title "ShielDepy 0.1.0" --notes-file apps/vscode/CHANGELOG.md`.
 
     Se o repositório for privado, só quem tem acesso a ele baixa. O Marketplace fica para depois: ele precisa de um publisher `shieldepy` criado em marketplace.visualstudio.com e de um token do Azure DevOps.
 - 2026-10-09: **C1 em andamento (parada no meio, a pedido do usuário). Feito até aqui: o motor nos 3 projetos, antes de instalar dependências.**
@@ -939,9 +939,9 @@ O `createApp` do contrato só precisa devolver um desses. O formato da topologia
 
 ## Fase 0 — Aperfeiçoar o grafo de código (pré-requisito)
 
-As limitações atuais do `CodeGraph`, documentadas no README e em [extract-ts.ts](shieldepy_p1/packages/core/src/code-graph/extract-ts.ts), fazem a BFS a partir de uma rota perder chamadas. Isso precisa ser corrigido antes:
+As limitações atuais do `CodeGraph`, documentadas no README e em [extract-ts.ts](../packages/core/src/code-graph/extract-ts.ts), fazem a BFS a partir de uma rota perder chamadas. Isso precisa ser corrigido antes:
 
-1. **Resolução de imports** ([resolve-import.ts](shieldepy_p1/packages/core/src/code-graph/resolve-import.ts)):
+1. **Resolução de imports** ([resolve-import.ts](../packages/core/src/code-graph/resolve-import.ts)):
    - `paths` e `baseUrl` do `tsconfig.json`
    - `require()` em CommonJS
    - re-exports e barrels (`export * from`, `export { x } from`, `index.ts`)
@@ -1316,7 +1316,7 @@ Medido no vulnerável:
 
 ## Fase 2 — LangGraph + Threat Modeler (`packages/agent/src/chaos/`)
 
-1. Dependências: `@langchain/langgraph` + `@langchain/core` em `packages/agent`. Nós chamam o `LLMProvider` existente ([provider.ts](shieldepy_p1/packages/agent/src/provider.ts)) — sem chat models do LangChain.
+1. Dependências: `@langchain/langgraph` + `@langchain/core` em `packages/agent`. Nós chamam o `LLMProvider` existente ([provider.ts](../packages/agent/src/provider.ts)) — sem chat models do LangChain.
 2. **`state.ts`** — `Annotation.Root`: `parsedGraph: TopologyGraph`, `identifiedRisks: Hypothesis[]`, `generatedTests: GeneratedTest[]`, `testResults: TestResult[]`, `errors: string[]`.
 3. **`catalog.ts`** — catálogo fixo de erros de produção: `timeout`, `http_5xx_intermittent`, `malformed_response`, `race_condition`, `retry_storm`, `partial_failure_after_external_call`, cada um com a `SensitivityTag` que o habilita.
 4. **`nodes/threat-modeler.ts`** — tier `deep`, `json: true`; system prompt rígido com o catálogo; entrada = `attackSurface` serializado. Saída `Hypothesis { id; routeId; failure: CatalogId; rationale; agent: 'network'|'concurrency'; params }`, validada por `validate-hypotheses.ts` (padrão de `core/src/interactions/validate.ts`): rota tem que existir, `failure` tem que estar no catálogo e ser compatível com as tags da rota — o resto é descartado.
@@ -1344,12 +1344,12 @@ I/O (escrever arquivos, rodar processo) é injetado nos nós via interface `Chao
 5. **GitHub Actions**: `.github/workflows/shieldepy-chaos.yml` (raiz do repo) — checkout, Node 22, `npm ci`, `shieldepy chaos <alvo> --report chaos-report.md --fail-on Alto`, publica em `$GITHUB_STEP_SUMMARY` e comenta no PR com `gh pr comment --edit-last || gh pr comment` (`permissions: pull-requests: write`); `ANTHROPIC_API_KEY` via secret, roda `--offline` quando ausente. Também um template documentado em `docs/` para repositórios-alvo.
 
 ## Exemplo de validação
-`shieldepy_p1/examples/checkout-express/`: `POST /checkout` que faz `SELECT stock` (pg; nos testes, PGlite em memória) → `fetch('https://api.stripe.com/v1/charges')` → `UPDATE stock`/`INSERT orders` **sem lock** (race proposital) e sem timeout no fetch. Inclui `shieldepy.chaos.config.ts` com os invariantes `stockNeverNegative` e `atMostOneOrder` e as requisições válidas. A variante `checkout-express-fixed` (reserva atômica antes de cobrar, com compensação, e `AbortSignal.timeout`) deve passar. *(Atualizado na 3a: PGlite no lugar do `pg-mem`, e reserva atômica no lugar de `FOR UPDATE`.)*
+`examples/checkout-express/`: `POST /checkout` que faz `SELECT stock` (pg; nos testes, PGlite em memória) → `fetch('https://api.stripe.com/v1/charges')` → `UPDATE stock`/`INSERT orders` **sem lock** (race proposital) e sem timeout no fetch. Inclui `shieldepy.chaos.config.ts` com os invariantes `stockNeverNegative` e `atMostOneOrder` e as requisições válidas. A variante `checkout-express-fixed` (reserva atômica antes de cobrar, com compensação, e `AbortSignal.timeout`) deve passar. *(Atualizado na 3a: PGlite no lugar do `pg-mem`, e reserva atômica no lugar de `FOR UPDATE`.)*
 
 ## Arquivos críticos
 - Já existem (E2/E3): `packages/core/src/topology/*`, `packages/core/src/sql/*`, `packages/core/src/chaos-config.ts`, `packages/agent/src/chaos/*`, `packages/agent/src/cost.ts`, `apps/cli/src/chaos.ts`, `examples/checkout-express*`.
 - Novos na E4: `apps/cli/src/chaos-run.ts` (runner), o relatório markdown, `.github/workflows/shieldepy-chaos.yml` e o template em `docs/`.
-- Alterar: [main.ts](shieldepy_p1/apps/cli/src/main.ts) (comandos `topology`/`chaos`, USAGE), `packages/core/src/index.ts`, `packages/agent/src/index.ts`, `packages/agent/package.json`, [WorkspaceModel.ts](shieldepy_p1/apps/vscode/src/workspace/WorkspaceModel.ts) (registrar extratores no `onParsed`) + comando de export na extensão, `shieldepy_p1/README.md` (seção nova + limites).
+- Alterar: [main.ts](../apps/cli/src/main.ts) (comandos `topology`/`chaos`, USAGE), `packages/core/src/index.ts`, `packages/agent/src/index.ts`, `packages/agent/package.json`, [WorkspaceModel.ts](../apps/vscode/src/workspace/WorkspaceModel.ts) (registrar extratores no `onParsed`) + comando de export na extensão, `README.md` (seção nova + limites).
 - Reusar: `CodeGraph.onParsed`, `getEnclosingSymbol`, `indexFiles`/`listSourceFiles`, `buildGraph`/`findCollisions`, `parseRules` (padrão de validação), `providerFromEnv`, `severityRank`, `gate()` da CLI.
 
 ## Verificação
