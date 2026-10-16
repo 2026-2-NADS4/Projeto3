@@ -1,0 +1,20 @@
+{
+  "name": "@shieldepy/cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "CLI: prova colisões e ciclos num projeto, explica os achados e serve de portão de CI (--fail-on).",
+  "bin": {
+    "shieldepy": "./bin/shieldepy.js"
+  },
+  "scripts": {
+    "start": "node bin/shieldepy.js"
+  },
+  "dependencies": {
+    "@shieldepy/agent": "*",
+    "@shieldepy/core": "*",
+    "@shieldepy/extractors": "*",
+    "@shieldepy/viewer": "*",
+    "tsx": "^4.23.15"
+  }
+}

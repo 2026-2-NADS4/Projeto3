@@ -1,0 +1,361 @@
+{
+  "name": "shieldepy",
+  "displayName": "ShielDepy — Guardião de Arquitetura",
+  "description": "Mapeia o workspace em grafos em memória — estrutura (imports/chamadas via Tree-sitter) e interações (quem lê/escreve cada campo em cada evento) — e PROVA ciclos e colisões antes do commit. A IA só explica o que o motor provou.",
+  "version": "0.1.0",
+  "publisher": "shieldepy",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/victorcmrg/ShielDepyExtension.git"
+  },
+  "homepage": "https://github.com/victorcmrg/ShielDepyExtension#readme",
+  "bugs": {
+    "url": "https://github.com/victorcmrg/ShielDepyExtension/issues"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Machine Learning",
+    "Linters"
+  ],
+  "activationEvents": [
+    "onStartupFinished",
+    "onUri"
+  ],
+  "main": "./dist/extension.js",
+  "icon": "media/icon.png",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "shieldepy",
+          "title": "ShielDepy",
+          "icon": "media/icon.svg"
+        },
+        {
+          "id": "shieldepy-settings",
+          "title": "ShielDepy: Configurações",
+          "icon": "media/icon-settings.svg"
+        }
+      ],
+      "secondarySidebar": [
+        {
+          "id": "shieldepy-chat",
+          "title": "Chat do ShielDepy",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "shieldepy": [
+        {
+          "id": "shieldepy.panel",
+          "name": "Lista de erros",
+          "type": "webview"
+        }
+      ],
+      "shieldepy-chat": [
+        {
+          "id": "shieldepy.chat",
+          "name": "Chat",
+          "type": "webview"
+        }
+      ],
+      "shieldepy-settings": [
+        {
+          "id": "shieldepy.settings",
+          "name": "Configurações",
+          "type": "webview"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "shieldepy.reviewImpact",
+        "title": "ShielDepy: Revisar Impacto no Grafo"
+      },
+      {
+        "command": "shieldepy.explainCollisions",
+        "title": "ShielDepy: Explicar Colisões do Workspace"
+      },
+      {
+        "command": "shieldepy.toggleInlineSuggestions",
+        "title": "ShielDepy: Ativar/Desativar Sugestões Inline"
+      },
+      {
+        "command": "shieldepy.scanWorkspace",
+        "title": "ShielDepy: Analisar Pasta Inteira"
+      },
+      {
+        "command": "shieldepy.showMap",
+        "title": "ShielDepy: Ver Mapa do Sistema"
+      },
+      {
+        "command": "shieldepy.exportTopology",
+        "title": "ShielDepy: Exportar Topologia (rotas e I/O)"
+      },
+      {
+        "command": "shieldepy.compareMap",
+        "title": "ShielDepy: Comparar Mapa com uma Branch"
+      },
+      {
+        "command": "shieldepy.runChaos",
+        "title": "ShielDepy: Testar Caos"
+      },
+      {
+        "command": "shieldepy.gettingStarted",
+        "title": "ShielDepy: Primeiros Passos"
+      },
+      {
+        "command": "shieldepy.setApiKey",
+        "title": "ShielDepy: Configurar Chave da IA"
+      },
+      {
+        "command": "shieldepy.attachFinding",
+        "title": "ShielDepy: Anexar Achado ao Chat",
+        "enablement": "false"
+      },
+      {
+        "command": "shieldepy.login",
+        "title": "ShielDepy: Entrar"
+      },
+      {
+        "command": "shieldepy.logout",
+        "title": "ShielDepy: Sair"
+      },
+      {
+        "command": "shieldepy.openDashboard",
+        "title": "ShielDepy: Abrir Painel Web da Conta"
+      },
+      {
+        "command": "shieldepy.refreshAccess",
+        "title": "ShielDepy: Verificar Acesso da Empresa"
+      },
+      {
+        "command": "shieldepy.openLocation",
+        "title": "ShielDepy: Abrir Trecho em Conflito",
+        "enablement": "false"
+      }
+    ],
+    "walkthroughs": [
+      {
+        "id": "start",
+        "title": "Primeiros passos com o ShielDepy",
+        "description": "Do mapa do código ao teste de caos: tudo roda nesta máquina, sem conta e sem IA.",
+        "steps": [
+          {
+            "id": "findings",
+            "title": "Veja o que o motor provou",
+            "description": "Ao abrir um projeto JS/TS, o mapa é montado sozinho. Ciclos e colisões aparecem no Problems, no Explorer e na lista de erros.\n[Abrir a lista de erros](command:shieldepy.panel.focus)",
+            "media": { "markdown": "media/walkthrough/findings.md" },
+            "completionEvents": ["onView:shieldepy.panel"]
+          },
+          {
+            "id": "map",
+            "title": "Confira o mapa do sistema",
+            "description": "Rotas, controllers, serviços, banco e APIs externas, ligados pelo que o código prova.\n[Ver o mapa](command:shieldepy.showMap)",
+            "media": { "markdown": "media/walkthrough/map.md" },
+            "completionEvents": ["onCommand:shieldepy.showMap"]
+          },
+          {
+            "id": "chaos",
+            "title": "Teste o caos nas rotas sensíveis",
+            "description": "Timeout, 5xx e corrida injetados nas rotas que gravam no banco ou chamam APIs. Na primeira vez, o contrato sai do mapa.\n[Testar caos](command:shieldepy.runChaos)",
+            "media": { "markdown": "media/walkthrough/chaos.md" },
+            "completionEvents": ["onCommand:shieldepy.runChaos"]
+          },
+          {
+            "id": "ai",
+            "title": "Opcional: ligue a IA",
+            "description": "Com uma chave Anthropic ou Gemini, a IA explica os achados, conversa no chat e propõe hipóteses de caos.\n[Configurar a chave](command:shieldepy.setApiKey)",
+            "media": { "markdown": "media/walkthrough/ai.md" },
+            "completionEvents": ["onCommand:shieldepy.setApiKey"]
+          }
+        ]
+      }
+    ],
+    "colors": [
+      {
+        "id": "shieldepy.importantForeground",
+        "description": "ShielDepy: arquivos com achado importante (quadrado) no Explorer.",
+        "defaults": { "dark": "#FF5F57", "light": "#D93A3F", "highContrast": "#FF6B63", "highContrastLight": "#B4232A" }
+      },
+      {
+        "id": "shieldepy.attentionForeground",
+        "description": "ShielDepy: arquivos com achado de atenção (triângulo) no Explorer.",
+        "defaults": { "dark": "#FEBC2E", "light": "#B87A00", "highContrast": "#FFD15C", "highContrastLight": "#8A5A00" }
+      },
+      {
+        "id": "shieldepy.lightForeground",
+        "description": "ShielDepy: arquivos só com achados leves (círculo) no Explorer.",
+        "defaults": { "dark": "#A8F5CB", "light": "#1F8F5A", "highContrast": "#B8FAD6", "highContrastLight": "#146B42" }
+      },
+      {
+        "id": "shieldepy.analyzingForeground",
+        "description": "ShielDepy: arquivo sendo analisado agora.",
+        "defaults": { "dark": "#10EF7C", "light": "#0B9E55", "highContrast": "#10EF7C", "highContrastLight": "#0A7A42" }
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        { "command": "shieldepy.login", "when": "shieldepy.portal" },
+        { "command": "shieldepy.logout", "when": "shieldepy.portal" },
+        { "command": "shieldepy.openDashboard", "when": "shieldepy.portal" },
+        { "command": "shieldepy.refreshAccess", "when": "shieldepy.portal" }
+      ]
+    },
+    "configurationDefaults": {
+      "chat.disableAIFeatures": true
+    },
+    "configuration": {
+      "title": "ShielDepy",
+      "properties": {
+        "shieldepy.aiProvider": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "anthropic",
+            "gemini",
+            "offline"
+          ],
+          "enumDescriptions": [
+            "Usa a primeira chave configurada: Anthropic, depois Gemini. Sem chave, modo offline.",
+            "Sempre Claude (Anthropic).",
+            "Sempre Google Gemini.",
+            "Nunca chama IA: só os achados determinísticos (ciclos e colisões)."
+          ],
+          "default": "auto",
+          "description": "Qual IA explica os achados. Ciclos e colisões são provados sem IA em qualquer modo."
+        },
+        "shieldepy.fastModel": {
+          "type": "string",
+          "default": "claude-haiku-4-5-20251001",
+          "description": "Modelo Anthropic das tarefas rápidas (sugestão inline, varredura em background)."
+        },
+        "shieldepy.deepModel": {
+          "type": "string",
+          "default": "claude-haiku-4-5-20251001",
+          "description": "Modelo Anthropic das tarefas profundas (chat, revisão de impacto, explicação de colisões)."
+        },
+        "shieldepy.geminiModel": {
+          "type": "string",
+          "default": "gemini-3.6-flash",
+          "description": "Modelo usado quando a IA ativa é o Gemini."
+        },
+        "shieldepy.inlineSuggestions.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Habilita sugestões inline (ghost text) baseadas no subgrafo de arquitetura."
+        },
+        "shieldepy.inlineSuggestions.debounceMs": {
+          "type": "number",
+          "default": 250,
+          "description": "Tempo de espera após parar de digitar antes de solicitar uma sugestão inline."
+        },
+        "shieldepy.backgroundAnalysis.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Analisa automaticamente o arquivo (digitação, colar código, ou edição programática): ciclos e colisões (grátis, determinísticos) e riscos via IA, publicados como Diagnostics."
+        },
+        "shieldepy.backgroundAnalysis.idleMs": {
+          "type": "number",
+          "default": 1200,
+          "description": "Tempo de inatividade (ms) após uma edição antes de rodar a análise automática.",
+          "minimum": 300,
+          "maximum": 5000
+        },
+        "shieldepy.backgroundAnalysis.trigger": {
+          "type": "string",
+          "enum": [
+            "onType",
+            "onSave"
+          ],
+          "enumDescriptions": [
+            "Analisa a cada pausa na digitação (após idleMs).",
+            "Analisa só ao salvar ou abrir o arquivo — mais econômico."
+          ],
+          "default": "onType",
+          "description": "Quando a análise automática roda."
+        },
+        "shieldepy.display.minSeverity": {
+          "type": "string",
+          "enum": [
+            "info",
+            "warning",
+            "error"
+          ],
+          "enumDescriptions": [
+            "Mostra tudo.",
+            "Esconde os ajustes leves.",
+            "Mostra só o que é importante."
+          ],
+          "default": "info",
+          "description": "Severidade mínima exibida no Problems, no marca-texto e no painel."
+        },
+        "shieldepy.analysis.exclude": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Globs extras ignorados pela análise (além de node_modules, dist, etc.). Ex.: **/*.test.ts"
+        },
+        "shieldepy.index.maxFiles": {
+          "type": "number",
+          "default": 3000,
+          "minimum": 10,
+          "maximum": 50000,
+          "description": "Máximo de arquivos indexados no mapa do workspace. Acima disso o mapa fica parcial e o ShielDepy avisa."
+        },
+        "shieldepy.statusBar.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Mostra o estado do ShielDepy (acesso, análise, contagem de achados) na barra de status."
+        },
+        "shieldepy.language": {
+          "type": "string",
+          "enum": [
+            "pt-BR",
+            "en-US",
+            "es",
+            "ru"
+          ],
+          "enumDescriptions": [
+            "Português (Brasil)",
+            "English (US)",
+            "Español",
+            "Русский"
+          ],
+          "default": "pt-BR",
+          "description": "Idioma da interface do ShielDepy (painéis, hover, Explorer, barra de status) e das respostas da IA."
+        },
+        "shieldepy.webBaseUrl": {
+          "type": "string",
+          "default": "",
+          "description": "Endereço do portal da conta da empresa (login, confirmação de dispositivo, política de IA). Vazio = sem portal: a extensão roda em modo local e a área da conta fica escondida. Em desenvolvimento: http://localhost:3000."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.mjs --production",
+    "watch": "node esbuild.mjs --watch",
+    "package": "npm run build && vsce package --no-dependencies --skip-license",
+    "test:e2e": "npm run build && node test-e2e/run.mjs"
+  },
+  "dependencies": {
+    "@shieldepy/agent": "*",
+    "@shieldepy/core": "*",
+    "@shieldepy/extractors": "*",
+    "@shieldepy/viewer": "*"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@vscode/test-electron": "^3.1.0",
+    "@vscode/vsce": "^3.0.0",
+    "esbuild": "^0.28.2"
+  }
+}
